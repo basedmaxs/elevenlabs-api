@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ElevenLabs Text-to-Speech</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Text to Speech</h1>
+        
+        <!-- Form untuk API Key dan Voice ID -->
+        <div class="api-form">
+            <h3>Konfigurasi API</h3>
+            <label for="apiKey">API Key:</label>
+            <input type="text" id="apiKey" placeholder="Masukkan API Key ElevenLabs">
+            <label for="voiceId">Voice ID:</label>
+            <input type="text" id="voiceId" placeholder="Masukkan Voice ID (contoh: 21m00Tcm4TlvDq8ikWAM)">
+            <button onclick="saveApiConfig()">Simpan Konfigurasi</button>
+        </div>
+
+        <!-- Form untuk Text-to-Speech -->
+        <div class="tts-form">
+            <h3>Konversi Teks ke Suara</h3>
+            <textarea id="textInput" placeholder="Masukkan teks..."></textarea>
+            <button onclick="convertTextToSpeech()">Convert</button>
+            <audio id="audioPlayer" controls></audio>
+            <p id="status"></p>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
