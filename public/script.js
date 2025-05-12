@@ -18,7 +18,7 @@ function saveApiConfig() {
     }
 
     localStorage.setItem('apiKey', apiKey);
-    localStorage.setItem('voiceId', voiceId);
+    localStorage.setItem('PsEYifg5ra2YMbPGwhb3', voiceId);
     status.textContent = 'Konfigurasi disimpan!';
 }
 
