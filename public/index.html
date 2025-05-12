@@ -10,14 +10,37 @@
     <div class="container">
         <h1>Text to Speech</h1>
         
-        <!-- Form untuk API Key dan Voice ID -->
+        <!-- Form untuk API Key -->
         <div class="api-form">
             <h3>Konfigurasi API</h3>
             <label for="apiKey">API Key:</label>
             <input type="text" id="apiKey" placeholder="Masukkan API Key ElevenLabs">
-            <label for="voiceId">Voice ID:</label>
-            <input type="text" id="voiceId" placeholder="Masukkan Voice ID (contoh: 21m00Tcm4TlvDq8ikWAM)">
-            <button onclick="saveApiConfig()">Simpan Konfigurasi</button>
+            <button onclick="saveApiKey()">Simpan API Key</button>
+            <p id="apiStatus"></p>
+        </div>
+
+        <!-- Form untuk Pengaturan Suara -->
+        <div class="voice-form">
+            <h3>Pengaturan Suara</h3>
+            <label for="voiceId">Pilih Suara:</label>
+            <select id="voiceId">
+                <option value="">-- Muat daftar suara --</option>
+            </select>
+            <label for="modelId">Pilih Model:</label>
+            <select id="modelId">
+                <option value="eleven_multilingual_v2">Multilingual v2 (Kualitas Tinggi)</option>
+                <option value="eleven_turbo_v2_5">Turbo v2.5 (Latensi Rendah)</option>
+                <option value="eleven_flash_v2_5">Flash v2.5 (Latensi Sangat Rendah)</option>
+            </select>
+            <label for="outputFormat">Format Audio:</label>
+            <select id="outputFormat">
+                <option value="mp3_44100_128">MP3 128kbps</option>
+                <option value="mp3_44100_192">MP3 192kbps</option>
+                <option value="pcm_44100">PCM 44.1kHz</option>
+                <option value="opus_48000_64">Opus 64kbps</option>
+            </select>
+            <button onclick="saveVoiceConfig()">Simpan Pengaturan</button>
+            <p id="voiceStatus"></p>
         </div>
 
         <!-- Form untuk Text-to-Speech -->
@@ -26,7 +49,7 @@
             <textarea id="textInput" placeholder="Masukkan teks..."></textarea>
             <button onclick="convertTextToSpeech()">Convert</button>
             <audio id="audioPlayer" controls></audio>
-            <p id="status"></p>
+            <p id="ttsStatus"></p>
         </div>
     </div>
     <script src="script.js"></script>
