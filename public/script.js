@@ -1,15 +1,15 @@
 // Muat konfigurasi dari localStorage saat halaman dimuat
 document.addEventListener('DOMContentLoaded', () => {
     const apiKey = localStorage.getItem('apiKey');
-    const voiceId = localStorage.getItem('voiceId');
+    const voiceId = localStorage.getItem('PsEYifg5ra2YMbPGwhb3');
     if (apiKey) document.getElementById('apiKey').value = apiKey;
-    if (voiceId) document.getElementById('voiceId').value = voiceId;
+    if (voiceId) document.getElementById('PsEYifg5ra2YMbPGwhb3').value = voiceId;
 });
 
 // Simpan API Key dan Voice ID ke localStorage
 function saveApiConfig() {
     const apiKey = document.getElementById('apiKey').value;
-    const voiceId = document.getElementById('voiceId').value;
+    const voiceId = document.getElementById('PsEYifg5ra2YMbPGwhb3').value;
     const status = document.getElementById('status');
 
     if (!apiKey || !voiceId) {
