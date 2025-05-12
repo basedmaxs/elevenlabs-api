@@ -1,72 +1,141 @@
-body {
-    font-family: Arial, sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    background-color: #f0f0f0;
-    margin: 0;
-    padding: 10px;
+// Muat konfigurasi dari localStorage saat halaman dimuat
+document.addEventListener('DOMContentLoaded', async () => {
+    const apiKey = localStorage.getItem('apiKey');
+    const voiceId = localStorage.getItem('voiceId');
+    const modelId = localStorage.getItem('modelId') || 'eleven_multilingual_v2';
+    const outputFormat = localStorage.getItem('outputFormat') || 'mp3_44100_128';
+
+    if (apiKey) document.getElementById('apiKey').value = apiKey;
+    if (voiceId) document.getElementById('voiceId').value = voiceId;
+    document.getElementById('modelId').value = modelId;
+    document.getElementById('outputFormat').value = outputFormat;
+
+    // Muat daftar suara jika API key tersedia
+    if (apiKey) await loadVoices(apiKey);
+});
+
+// Simpan API Key
+function saveApiKey() {
+    const apiKey = document.getElementById('apiKey').value;
+    const apiStatus = document.getElementById('apiStatus');
+
+    if (!apiKey) {
+        apiStatus.textContent = 'Masukkan API Key!';
+        return;
+    }
+
+    localStorage.setItem('apiKey', apiKey);
+    apiStatus.textContent = 'API Key disimpan!';
+    loadVoices(apiKey);
 }
 
-.container {
-    text-align: center;
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    max-width: 90%;
-    width: 400px;
+// Muat daftar suara dari ElevenLabs
+async function loadVoices(apiKey) {
+    const voiceSelect = document.getElementById('voiceId');
+    const voiceStatus = document.getElementById('voiceStatus');
+
+    try {
+        const response = await fetch('YOUR_WORKER_URL/api/voices', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ apiKey })
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Gagal memuat suara: ${errorText}`);
+        }
+
+        const voices = await response.json();
+        voiceSelect.innerHTML = '<option value="">-- Pilih suara --</option>';
+        voices.forEach(voice => {
+            const option = document.createElement('option');
+            option.value = voice.voice_id;
+            option.textContent = voice.name;
+            voiceSelect.appendChild(option);
+        });
+
+        const savedVoiceId = localStorage.getItem('voiceId');
+        if (savedVoiceId) voiceSelect.value = savedVoiceId;
+        voiceStatus.textContent = 'Daftar suara dimuat!';
+    } catch (error) {
+        voiceStatus.textContent = `Error: ${error.message}`;
+        console.error('Error loading voices:', error);
+    }
 }
 
-.api-form, .voice-form, .tts-form {
-    margin-bottom: 20px;
+// Simpan pengaturan suara
+function saveVoiceConfig() {
+    const voiceId = document.getElementById('voiceId').value;
+    const modelId = document.getElementById('modelId').value;
+    const outputFormat = document.getElementById('outputFormat').value;
+    const voiceStatus = document.getElementById('voiceStatus');
+
+    if (!voiceId) {
+        voiceStatus.textContent = 'Pilih suara!';
+        return;
+    }
+
+    localStorage.setItem('voiceId', voiceId);
+    localStorage.setItem('modelId', modelId);
+    localStorage.setItem('outputFormat', outputFormat);
+    voiceStatus.textContent = 'Pengaturan suara disimpan!';
 }
 
-h3 {
-    margin: 10px 0;
-    font-size: 1.2em;
-}
+// Konversi teks ke suara
+async function convertTextToSpeech() {
+    const textInput = document.getElementById('textInput').value;
+    const apiKey = localStorage.getItem('apiKey');
+    const voiceId = localStorage.getItem('voiceId');
+    const modelId = localStorage.getItem('modelId');
+    const outputFormat = localStorage.getItem('outputFormat');
+    const audioPlayer = document.getElementById('audioPlayer');
+    const ttsStatus = document.getElementById('ttsStatus');
 
-label {
-    display: block;
-    margin: 5px 0;
-    font-weight: bold;
-}
+    console.log('API Key:', apiKey);
+    console.log('Voice ID:', voiceId);
+    console.log('Model ID:', modelId);
+    console.log('Output Format:', outputFormat);
+    console.log('Text:', textInput);
 
-input, textarea, select {
-    width: 100%;
-    padding: 10px;
-    margin: 5px 0;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-sizing: border-box;
-}
+    if (!textInput) {
+        ttsStatus.textContent = 'Masukkan teks!';
+        return;
+    }
 
-textarea {
-    height: 100px;
-}
+    if (!apiKey || !voiceId || !modelId || !outputFormat) {
+        ttsStatus.textContent = 'Simpan API Key dan pengaturan suara terlebih dahulu!';
+        return;
+    }
 
-button {
-    padding: 10px 20px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin: 10px 0;
-}
+    ttsStatus.textContent = 'Mengonversi...';
 
-button:hover {
-    background-color: #0056b3;
-}
+    try {
+        const response = await fetch('YOUR_WORKER_URL/api/text-to-speech', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                text: textInput,
+                apiKey,
+                voiceId,
+                model_id: modelId,
+                output_format: outputFormat,
+                apply_language_text_normalization: modelId === 'eleven_flash_v2_5' // Aktifkan untuk flash
+            })
+        });
 
-audio {
-    margin-top: 10px;
-    width: 100%;
-}
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Gagal mengonversi teks: ${errorText}`);
+        }
 
-p {
-    color: #333;
-    margin: 10px 0;
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        audioPlayer.src = url;
+        audioPlayer.play();
+        ttsStatus.textContent = 'Berhasil! Memutar audio...';
+    } catch (error) {
+        ttsStatus.textContent = `Error: ${error.message}`;
+        console.error('Error converting text:', error);
+    }
 }
