@@ -30,6 +30,10 @@ async function convertTextToSpeech() {
     const audioPlayer = document.getElementById('audioPlayer');
     const status = document.getElementById('status');
 
+    console.log('API Key:', apiKey);
+    console.log('Voice ID:', voiceId);
+    console.log('Text:', textInput);
+
     if (!textInput) {
         status.textContent = 'Masukkan teks!';
         return;
@@ -43,13 +47,22 @@ async function convertTextToSpeech() {
     status.textContent = 'Mengonversi...';
 
     try {
-        const response = await fetch('https://elevenlabs-api.pages.dev//api/text-to-speech', {
+        const response = await fetch('YOUR_WORKER_URL/api/text-to-speech', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text: textInput, apiKey, voiceId })
+            body: JSON.stringify({
+                text: textInput,
+                apiKey,
+                voiceId,
+                model_id: 'eleven_multilingual_v2',
+                output_format: 'mp3_44100_128'
+            })
         });
 
-        if (!response.ok) throw new Error('Gagal mengonversi teks');
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Gagal mengonversi teks: ${errorText}`);
+        }
 
         const blob = await response.blob();
         const url = URL.createObjectURL(blob);
@@ -58,5 +71,6 @@ async function convertTextToSpeech() {
         status.textContent = 'Berhasil! Memutar audio...';
     } catch (error) {
         status.textContent = `Error: ${error.message}`;
+        console.error('Error details:', error);
     }
 }
