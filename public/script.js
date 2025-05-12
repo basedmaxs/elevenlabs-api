@@ -47,7 +47,7 @@ async function convertTextToSpeech() {
     status.textContent = 'Mengonversi...';
 
     try {
-        const response = await fetch('YOUR_WORKER_URL/api/text-to-speech', {
+        const response = await fetch('https://elevenlabs-api.pages.dev//api/text-to-speech', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
